@@ -1,11 +1,13 @@
 {
-  "compilerOptions": {// Configurações do compilador TypeScript
-    "target": "ES2020",// Especifica a versão do JavaScript para a qual o TypeScript será compilado
-    "module": "commonjs",// Especifica o sistema de módulos a ser usado
-    "outDir": "./dist",// Especifica o diretório de saída para os arquivos compilados
-    "rootDir": "./src",// Especifica o diretório raiz dos arquivos de origem
-    "strict": true, // Habilita todas as verificações de tipo estritas
-    "esModuleInterop": true,// Permite a importação de módulos CommonJS usando a sintaxe de importação ES6
-    "skipLibCheck": true // Ignora a verificação de tipos em arquivos de declaração
-  }
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.tsx"]
 }
