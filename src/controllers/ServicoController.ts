@@ -1,6 +1,6 @@
 export {}
 const Servico = require('../models/Servico')
-
+// Função para listar os serviços
 const listarServicos = async (req: any, res: any) => {
     try {
         const servicos = await Servico.find()
@@ -9,7 +9,7 @@ const listarServicos = async (req: any, res: any) => {
         res.status(500).json({ error: 'Erro ao listar os serviços' })
     }
 }
-
+// Função para criar um novo serviço
 const criarServico = async (req: any, res: any) => {
     try {
         const novoServico = await Servico.create(req.body)
@@ -18,7 +18,7 @@ const criarServico = async (req: any, res: any) => {
         res.status(500).json({ error: 'Erro ao criar o serviço' })
     }
 }
-
+// Função para atualizar um serviço existente
 const atualizarServico = async (req: any, res: any) => {
     const { id } = req.params
     try {
@@ -31,7 +31,7 @@ const atualizarServico = async (req: any, res: any) => {
         res.status(500).json({ error: 'Erro ao atualizar o serviço' })
     }
 }
-
+// Função para deletar um serviço
 const deletarServico = async (req: any, res: any) => {
     try {
         const servicoDeletado = await Servico.findByIdAndDelete(req.params.id)
