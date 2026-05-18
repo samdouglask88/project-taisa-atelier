@@ -1,4 +1,6 @@
-// src/server.ts
+// Carrega as variáveis de ambiente do arquivo .env
+require('dotenv').config()
+// Importações
 import express from 'express' 
 const conectarBanco = require('./config/database')
 const servicosRouter = require('./routes/servicos')
@@ -7,7 +9,7 @@ const agendamentosRouter = require('./routes/agendamentos')
 const authRouter = require('./routes/auth')
 const autenticar = require('./middlewares/autenticar')
 const app = express()
-const PORT = 3333
+const PORT = process.env.PORT || 3333
 // Middleware para lidar com CORS
 app.use(express.json()) // Middleware para parsear JSON
 app.use('/servicos', autenticar, servicosRouter)// Rota protegida para serviços, requer autenticação

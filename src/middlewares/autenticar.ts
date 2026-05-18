@@ -9,7 +9,7 @@ const autenticar = (req: any, res: any, next: any) => {
         return res.status(401).json({ error: 'Token não fornecido' })
     }
 
-    jwt.verify(token, 'segredo123', (err: any, decoded: any) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err: any, decoded: any) => {
         if (err) return res.status(401).json({ error: 'Token inválido' })
         next()
     })
