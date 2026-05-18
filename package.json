@@ -18,11 +18,15 @@
   },
   "homepage": "https://github.com/samdouglask88/project-taisa-atelier#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.6.2"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.6.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^6.0.3"
