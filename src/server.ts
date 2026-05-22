@@ -1,34 +1,27 @@
-// Carrega as variáveis de ambiente do arquivo .env
 require('dotenv').config()
-// Importações
-import express from 'express' 
-const conectarBanco = require('./config/database')
-const servicosRouter = require('./routes/servicos')
-const clientesRouter = require('./routes/clientes')
-const agendamentosRouter = require('./routes/agendamentos')
+import express from 'express'
+const connectDatabase = require('./config/database')
+const servicesRouter = require('./routes/services')
+const clientsRouter = require('./routes/clients')
+const appointmentsRouter = require('./routes/appointments')
 const authRouter = require('./routes/auth')
-const autenticar = require('./middlewares/autenticar')
+const authenticate = require('./middlewares/authenticate')
+
 const app = express()
 const PORT = process.env.PORT || 3333
-// Middleware para lidar com CORS
-app.use(express.json()) // Middleware para parsear JSON
-app.use('/servicos', autenticar, servicosRouter)// Rota protegida para serviços, requer autenticação
-app.use('/clientes', autenticar, clientesRouter)// Rota protegida para clientes, requer autenticação
-app.use('/agendamentos', autenticar, agendamentosRouter)// Rota protegida para agendamentos, requer autenticação
-app.use('/auth', authRouter)// Rota para autenticação, não requer autenticação
 
-
+app.use(express.json())
+app.use('/services', authenticate, servicesRouter)
+app.use('/clients', authenticate, clientsRouter)
+app.use('/appointments', authenticate, appointmentsRouter)
+app.use('/auth', authRouter)
 
 const startServer = async () => {
     try {
-        await conectarBanco()
-
-        app.listen(PORT, () => {
-            console.log(`Servidor rodando na porta ${PORT}`)
-        })
-
+        await connectDatabase()
+        app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
     } catch (error) {
-        console.error('Erro ao iniciar o servidor:', error)
+        console.error('Failed to start server:', error)
     }
 }
 

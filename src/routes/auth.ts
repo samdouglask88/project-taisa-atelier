@@ -1,10 +1,10 @@
-export{}
+export {}
 const { Router } = require('express')
-const { login, registrar } = require('../controllers/AuthController')
+const { login, register } = require('../controllers/AuthController')
 
 const router = Router()
 
 router.post('/login', login)
-router.post('/registrar', registrar)
+router.post('/register', register)
 
-module.exports = router 
+module.exports = router

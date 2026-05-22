@@ -1,37 +1,35 @@
 export {}
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const Usuario = require('../models/Usuario')
+const User = require('../models/User')
 
-// Registra um novo usuário com senha criptografada
-const registrar = async (req: any, res: any) => {
+const register = async (req: any, res: any) => {
     try {
-        const { nome, email, senha } = req.body
-        const senhaCriptografada = await bcrypt.hash(senha, 10)
-        const usuario = await Usuario.create({ nome, email, senha: senhaCriptografada })
-        res.status(201).json({ mensagem: 'Usuário registrado com sucesso', dados: usuario })
+        const { name, email, password } = req.body
+        const hashedPassword = await bcrypt.hash(password, 10)
+        const user = await User.create({ name, email, password: hashedPassword })
+        res.status(201).json({ message: 'User registered successfully', data: user })
     } catch (error) {
-        res.status(500).json({ error: 'Erro ao registrar o usuário' })
+        res.status(500).json({ error: 'Failed to register user' })
     }
 }
 
-// Autentica o usuário e retorna o token JWT
 const login = async (req: any, res: any) => {
     try {
-        const { email, senha } = req.body
-        const usuario = await Usuario.findOne({ email })
-        if (!usuario) {
-            return res.status(401).json({ error: 'Email ou senha inválidos' })
+        const { email, password } = req.body
+        const user = await User.findOne({ email })
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid email or password' })
         }
-        const senhaCorreta = await bcrypt.compare(senha, usuario.senha)
-        if (!senhaCorreta) {
-            return res.status(401).json({ error: 'Email ou senha inválidos' })
+        const passwordMatch = await bcrypt.compare(password, user.password)
+        if (!passwordMatch) {
+            return res.status(401).json({ error: 'Invalid email or password' })
         }
-        const token = jwt.sign({ id: usuario._id }, process.env.JWT_SECRET, { expiresIn: '1d' })
-        res.json({ mensagem: 'Login realizado com sucesso', token })
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' })
+        res.json({ message: 'Login successful', token })
     } catch (error) {
-        res.status(500).json({ error: 'Erro ao realizar login' })
+        res.status(500).json({ error: 'Failed to login' })
     }
 }
 
-module.exports = { registrar, login }
+module.exports = { register, login }
