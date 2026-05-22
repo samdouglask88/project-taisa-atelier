@@ -1,13 +1,12 @@
 export {}
 const { Router } = require('express')
-const { listarAgendamentos, criarAgendamento, atualizarAgendamento, deletarAgendamento } = require('../controllers/AgendamentoController')
+const { listAppointments, createAppointment, updateAppointment, deleteAppointment } = require('../controllers/AppointmentController')
 
 const router = Router()
 
-router.get('/', listarAgendamentos)
-router.post('/', criarAgendamento)
-router.put('/:id', atualizarAgendamento)
-router.delete('/:id', deletarAgendamento)
-
+router.get('/', listAppointments)
+router.post('/', createAppointment)
+router.put('/:id', updateAppointment)
+router.delete('/:id', deleteAppointment)
 
 module.exports = router

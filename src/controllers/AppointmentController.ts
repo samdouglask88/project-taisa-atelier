@@ -1,51 +1,50 @@
 export {}
-const Agendamento = require('../models/Agendamento')
+const Appointment = require('../models/Appointment')
 
-// função para listar os agendamentos
-const listarAgendamentos = async (req:any, res:any) => {
+const listAppointments = async (req: any, res: any) => {
     try {
-        const agendamentos = await Agendamento.find()
-        res.json ({mensagem: 'Agendamentos listados com sucesso', dados: agendamentos})
-    } catch (error){
-        res.status(500).json({error: 'Error ao listar os agendamentos'})
-    }
-}
-// função para criar um novo agendamento
-const criarAgendamento = async (req:any, res:any) => {
-    try {
-        const novoAgendamento = await Agendamento.create(req.body)
-        if (!novoAgendamento){
-            return res.status(400).json({error: 'dados do aggendamento inválidos'})
-        }
-        res.status(201).json({mensagem: 'Agendamento criado com sucesso', dados: novoAgendamento})
-    } catch (error){
-        res.status(500).json({error: 'Erro ao criar o agendamento'})
-    }
-}
-// função para atualizar um agendamento existente
-const atualizarAgendamento = async (req:any, res:any) => {
-    const {id} = req.params
-    try {
-        const agendamentoAtualizado = await Agendamento.findByIdAndUpdate(id, req.body, {new: true})
-        if (!agendamentoAtualizado){
-            return res.status(404).json({error: 'Agendamento não encontrado'})
-        }
-        res.json({mensagem: 'Agendamento atualizado com sucesso', dados: agendamentoAtualizado})
-    } catch (error){
-        res.status(500).json({error: 'Erro ao atualizar o agendamento'})
-    }
-}
-// função para deletar um agendamento 
-const deletarAgendamento = async (req:any, res:any) => {
-    try {
-        const agendamentoDeletado = await Agendamento.findByIdAndDelete(req.params.id)
-        if (!agendamentoDeletado){
-            return res.status(404).json({error: 'Agendamento não encontrado'})
-        }
-        res.json({mensagem: 'Agendamento deletado com sucesso', dados: agendamentoDeletado})
-    } catch (error){
-        res.status(500).json({error: 'Erro ao deletar o agendamento'})
+        const appointments = await Appointment.find()
+        res.json({ message: 'Appointments listed successfully', data: appointments })
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to list appointments' })
     }
 }
 
-module.exports = {listarAgendamentos, criarAgendamento, atualizarAgendamento, deletarAgendamento}
+const createAppointment = async (req: any, res: any) => {
+    try {
+        const newAppointment = await Appointment.create(req.body)
+        if (!newAppointment) {
+            return res.status(400).json({ error: 'Invalid appointment data' })
+        }
+        res.status(201).json({ message: 'Appointment created successfully', data: newAppointment })
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to create appointment' })
+    }
+}
+
+const updateAppointment = async (req: any, res: any) => {
+    const { id } = req.params
+    try {
+        const updatedAppointment = await Appointment.findByIdAndUpdate(id, req.body, { new: true })
+        if (!updatedAppointment) {
+            return res.status(404).json({ error: 'Appointment not found' })
+        }
+        res.json({ message: 'Appointment updated successfully', data: updatedAppointment })
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update appointment' })
+    }
+}
+
+const deleteAppointment = async (req: any, res: any) => {
+    try {
+        const deletedAppointment = await Appointment.findByIdAndDelete(req.params.id)
+        if (!deletedAppointment) {
+            return res.status(404).json({ error: 'Appointment not found' })
+        }
+        res.json({ message: 'Appointment deleted successfully', data: deletedAppointment })
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to delete appointment' })
+    }
+}
+
+module.exports = { listAppointments, createAppointment, updateAppointment, deleteAppointment }

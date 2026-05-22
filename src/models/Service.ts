@@ -1,28 +1,14 @@
-import e from 'express'
-import mongoose, { Schema, Document } from 'mongoose'
+export {}
+const mongoose = require('mongoose')
+const { Schema } = mongoose
 
-
-
-//Coluna de Agendamento
-interface Servico extends Document {
-    nome: string
-    descricao: string
-    preco: number
-    duracaoHoras?: number
-    categoria: string
-    ativo: boolean
-}
-//registra o modelo de serviço no mongoose
- const ServicoSchema = new Schema({
-    nome:        { type: String, required: true },
-    descricao:   { type: String, required: true },
-    preco:       { type: Number, required: true },
-    duracaoHoras:{ type: Number },
-    categoria:   { type: String, required: true },
-    ativo:       { type: Boolean, default: true },
-    
+const ServiceSchema = new Schema({
+    name:          { type: String, required: true },
+    description:   { type: String, required: true },
+    price:         { type: Number, required: true },
+    durationHours: { type: Number },
+    category:      { type: String, required: true },
+    active:        { type: Boolean, default: true },
 })
-//exporta o modelo para ser usado em outros arquivos
-export default mongoose.model<Servico>('Servico', ServicoSchema)
-module.exports = mongoose.model('Servico', ServicoSchema)
 
+module.exports = mongoose.model('Service', ServiceSchema)

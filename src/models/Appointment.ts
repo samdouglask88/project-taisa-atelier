@@ -2,15 +2,13 @@ export {}
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 
-//Coluna de agendamento
-const AgendamentoSchema = new Schema({
-    cliente:     { type: Schema.Types.ObjectId, ref: 'Cliente', required: true },
-    data:        { type: Date, required: true },
-    hora:        { type: String, required: true },
-    servico:     { type: String, required: true },
-    valor:       { type: Number, required: true },
-    status: { type: String, default: 'agendado' }
+const AppointmentSchema = new Schema({
+    client:   { type: Schema.Types.ObjectId, ref: 'Client', required: true },
+    date:     { type: Date, required: true },
+    time:     { type: String, required: true },
+    service:  { type: String, required: true },
+    price:    { type: Number, required: true },
+    status:   { type: String, default: 'scheduled' }
 })
 
-//exporta o modelo para ser usado em outros arquivos
-module.exports = mongoose.model('Agendamento', AgendamentoSchema)
+module.exports = mongoose.model('Appointment', AppointmentSchema)
