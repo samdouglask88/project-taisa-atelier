@@ -1,13 +1,11 @@
-export {}
-const mongoose = require('mongoose')
-const { Schema } = mongoose
+import mongoose, { Schema } from 'mongoose'
 
 const ClientSchema = new Schema({
     name:      { type: String, required: true },
-    email:     { type: String, required: true },
+    email:     { type: String, required: true, unique: true },
     phone:     { type: String, required: true },
-    address:   { type: String, required: true },
-    instagram: { type: String, required: true },
-})
+    address:   { type: String },
+    instagram: { type: String },
+}, { timestamps: true })
 
-module.exports = mongoose.model('Client', ClientSchema)
+export default mongoose.model('Client', ClientSchema)

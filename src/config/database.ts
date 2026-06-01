@@ -1,8 +1,9 @@
 import mongoose from 'mongoose'
 
 const connectDatabase = async (): Promise<void> => {
+    const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/taisa-atelier'
     try {
-        await mongoose.connect('mongodb://localhost:27017/taisa-atelier')
+        await mongoose.connect(uri)
         console.log('MongoDB connected successfully!')
     } catch (error) {
         console.error('Failed to connect to MongoDB:', error)
@@ -10,4 +11,4 @@ const connectDatabase = async (): Promise<void> => {
     }
 }
 
-module.exports = connectDatabase
+export default connectDatabase

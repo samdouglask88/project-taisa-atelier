@@ -1,5 +1,4 @@
-export {}
-const jwt = require('jsonwebtoken')
+import jwt from 'jsonwebtoken'
 
 const authenticate = (req: any, res: any, next: any) => {
     const authHeader = req.headers['authorization']
@@ -9,11 +8,11 @@ const authenticate = (req: any, res: any, next: any) => {
         return res.status(401).json({ error: 'Token not provided' })
     }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err: any, decoded: any) => {
+    jwt.verify(token, process.env.JWT_SECRET!, (err: any, decoded: any) => {
         if (err) return res.status(401).json({ error: 'Invalid token' })
         req.user = decoded
         next()
     })
 }
 
-module.exports = authenticate
+export default authenticate
