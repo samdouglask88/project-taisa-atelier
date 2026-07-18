@@ -116,6 +116,8 @@ Resumo dos controles implementados:
   - `loginRateLimiter`: 10 tentativas / 15 min por IP em `/auth/login` (não conta tentativas bem-sucedidas).
   - `bookingRateLimiter`: 20 requisições / 15 min em `/appointments/book` (rota pública, alvo comum de spam/abuso).
 - **Logging de segurança e alertas** (`utils/securityLogger.ts` + model `SecurityLog`): toda tentativa de login (sucesso ou falha) é registrada com e-mail, IP e user-agent. Ao atingir **5 falhas em 15 minutos** para o mesmo e-mail, é emitido um log `[security-alert]` no console — ponto de extensão pronto para plugar e-mail/Slack/PagerDuty.
+- **Lockout de login**: com 5+ falhas na janela de 15 min para o mesmo e-mail, o login passa a responder `429` antes mesmo de consultar o banco de usuários. Um login bem-sucedido zera a contagem; o bloqueio expira sozinho conforme as falhas saem da janela.
+- **Logout com revogação de token** (`models/RevokedToken.ts`): `POST /auth/logout` registra o hash do JWT numa blacklist com TTL; o middleware `authenticate` rejeita tokens revogados em toda requisição subsequente.
 
 ## Notificações WhatsApp
 
@@ -156,7 +158,8 @@ Legenda: 🔒 exige `Authorization: Bearer <token>` · 🌐 público.
 
 | Método | Rota | Acesso | Body | Observações |
 |---|---|---|---|---|
-| POST | `/auth/login` | 🌐 (rate limited) | `{ email, password }` | Retorna `{ token, user }`. Toda tentativa é logada em `SecurityLog` |
+| POST | `/auth/login` | 🌐 (rate limited) | `{ email, password }` | Retorna `{ token, user }`. Toda tentativa é logada em `SecurityLog`. Após **5 falhas em 15 min** para o mesmo e-mail, responde `429` até as falhas envelhecerem para fora da janela (lockout) |
+| POST | `/auth/logout` | 🔒 | — | Revoga o token atual: o hash SHA-256 entra na collection `RevokedToken` (TTL até a expiração natural do JWT) e o token deixa de ser aceito imediatamente |
 
 Não existe `POST /auth/register`. Use `npm run create-admin`.
 
@@ -203,7 +206,7 @@ Não existe `POST /auth/register`. Use `npm run create-admin`.
 
 ## Limitações conhecidas / próximos passos
 
-- O fluxo completo (login → booking → notificação WhatsApp) ainda não foi validado end-to-end contra um MongoDB e uma Evolution API reais — apenas `tsc --noEmit`/`npm run build` foram verificados.
+- O fluxo principal (login, lockout, logout/revogação, CRUD, booking público, validação) foi validado end-to-end contra um MongoDB 7.0 local. A exceção é o **envio de WhatsApp**, que segue não testado contra uma Evolution API real (chaves do `.env` são placeholders).
 - O alerta de tentativas de login falhas hoje só loga no console (`[security-alert]`); falta integração com um canal real de alerta (e-mail, Slack, PagerDuty).
 - A fila de notificações é em memória e por processo — adequada para uma instância única. Se a API precisar rodar em múltiplas instâncias/horizontalmente, migrar para BullMQ + Redis.
 - O payload enviado à Evolution API assume o contrato v2 (`POST /message/sendText/{instance}`); confirme contra a versão realmente instalada antes de ir para produção.

@@ -3,6 +3,7 @@ import SecurityLog from '../models/SecurityLog'
 
 const FAILED_LOGIN_ALERT_THRESHOLD = 5
 const FAILED_LOGIN_WINDOW_MS = 15 * 60 * 1000
+const LOCKOUT_THRESHOLD = 5
 
 function getClientIp(req: Request): string {
     const forwarded = req.headers['x-forwarded-for']
@@ -10,8 +11,32 @@ function getClientIp(req: Request): string {
     return req.socket.remoteAddress || 'unknown'
 }
 
-// Persists the attempt and raises a tagged console alert past the threshold.
-// Wire this alert into email/Slack/PagerDuty once an alerting channel exists.
+// Um e-mail fica bloqueado enquanto tiver LOCKOUT_THRESHOLD ou mais falhas
+// dentro da janela deslizante, contando apenas falhas posteriores ao login
+// bem-sucedido mais recente (um login legítimo zera a contagem). O bloqueio
+// se desfaz sozinho conforme as falhas envelhecem para fora da janela.
+export async function isLockedOut(email: string): Promise<boolean> {
+    const since = new Date(Date.now() - FAILED_LOGIN_WINDOW_MS)
+
+    const lastSuccess = await SecurityLog.findOne(
+        { event: 'login', success: true, email, createdAt: { $gte: since } },
+        { createdAt: 1 },
+        { sort: { createdAt: -1 } },
+    )
+
+    const failuresSince = lastSuccess ? lastSuccess.get('createdAt') : since
+    const recentFailures = await SecurityLog.countDocuments({
+        event: 'login',
+        success: false,
+        email,
+        createdAt: { $gte: failuresSince },
+    })
+
+    return recentFailures >= LOCKOUT_THRESHOLD
+}
+
+// Persiste a tentativa e emite um alerta marcado no console ao passar do
+// limite. Plugar esse alerta em e-mail/Slack/PagerDuty quando houver canal.
 export async function logLoginAttempt(req: Request, email: string, success: boolean): Promise<void> {
     const ip = getClientIp(req)
     const userAgent = req.headers['user-agent'] || 'unknown'

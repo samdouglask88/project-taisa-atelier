@@ -1,6 +1,13 @@
+import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
+import crypto from 'crypto'
+import RevokedToken from '../models/RevokedToken'
 
-const authenticate = (req: any, res: any, next: any) => {
+export function hashToken(token: string): string {
+    return crypto.createHash('sha256').update(token).digest('hex')
+}
+
+const authenticate = async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
 
@@ -8,11 +15,20 @@ const authenticate = (req: any, res: any, next: any) => {
         return res.status(401).json({ error: 'Token not provided' })
     }
 
-    jwt.verify(token, process.env.JWT_SECRET!, (err: any, decoded: any) => {
-        if (err) return res.status(401).json({ error: 'Invalid token' })
-        req.user = decoded
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!)
+
+        const revoked = await RevokedToken.exists({ tokenHash: hashToken(token) })
+        if (revoked) {
+            return res.status(401).json({ error: 'Token revoked' })
+        }
+
+        ;(req as any).user = decoded
+        ;(req as any).token = token
         next()
-    })
+    } catch {
+        return res.status(401).json({ error: 'Invalid token' })
+    }
 }
 
 export default authenticate
